@@ -2,16 +2,16 @@ package constant
 
 const (
 	// Environment
-	ConfigDirectoryEnvVar  = "SITE_CONFIG_PATH"
-	DefaultConfigDirectory = "/etc/site/admin"
+	ConfigDirectoryEnvVar  = "CJ_EXP_CONFIG_PATH"
+	DefaultConfigDirectory = "/etc/cjexp/admin"
 
 	// Cache
-	CachePrefix         = "prefix-%s"
-	CachePrefixModified = "prefix-%s-modified"
-	CacheFileFolderName = "site"
+	CachePrefix         = "cjexp-%s"
+	CachePrefixModified = "cjexp-%s-modified"
+	CacheFileFolderName = "cjexp"
 
 	// Session
-	SessionCookie      = "session"
-	SessionCachePrefix = "session-%s-%s"
-	FlashBagSession    = "flashBag"
+	SessionCookie      = "cj-exp-session"
+	SessionCachePrefix = "cj-exp-session-%s-%s"
+	FlashBagSession    = "cj-exp-flashBag"
 )
