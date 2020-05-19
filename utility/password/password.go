@@ -2,6 +2,7 @@ package password
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 
 	"github.com/cjexp/base/utility/configuration"
 	"github.com/cjexp/base/utility/loggers"
@@ -31,18 +32,28 @@ func GetPassword(context ctx.BackgroundContext) Password {
 }
 
 func (p password) SaltPassword(password string) string {
-	hash, err := bcrypt.GenerateFromPassword([]byte(p.salt+password), 14)
+	salt := convertToByte(p.salt)
+	hash, err := bcrypt.GenerateFromPassword(append(salt, []byte(password)...), 14)
 	p.errorService.CheckErrorAndPanic(err)
 
 	return base64.URLEncoding.EncodeToString(hash)
 }
 
 func (p password) CheckPassword(password, hash string) (ok bool) {
+	salt := convertToByte(p.salt)
 	hashBytes, err := base64.URLEncoding.DecodeString(hash)
 	if nil != err {
 		return
 	}
 
-	ok = nil == bcrypt.CompareHashAndPassword(hashBytes, []byte(p.salt+password))
+	ok = nil == bcrypt.CompareHashAndPassword(hashBytes, append(salt, []byte(password)...))
 	return
+}
+
+func convertToByte(saltStr string) []byte {
+	salt, err := hex.DecodeString(saltStr)
+	if err != nil {
+		salt = []byte(saltStr)
+	}
+	return salt
 }
