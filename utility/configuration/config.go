@@ -33,7 +33,7 @@ func GetConfig(context ctx.BackgroundContext) Base {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		config := &Base{}
-		ParseConfig(context, "base.json", config)
+		ParseConfig(context, "base.toml", config)
 		return *config, nil
 	}).(Base)
 }
