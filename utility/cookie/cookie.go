@@ -3,13 +3,13 @@
 package cookie
 
 import (
+	"encoding/hex"
 	"net/http"
 
-	"github.com/cjexp/base/utility/cookie/internal"
-
-	"github.com/cjtoolkit/ctx"
 	"github.com/cjexp/base/utility/configuration"
+	"github.com/cjexp/base/utility/cookie/internal"
 	"github.com/cjexp/base/utility/loggers"
+	"github.com/cjtoolkit/ctx"
 	"github.com/gorilla/securecookie"
 )
 
@@ -24,7 +24,7 @@ func GetHelper(context ctx.BackgroundContext) Helper {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		return Helper(cookieHelper{
-			secureCookie: securecookie.New([]byte(configuration.GetConfig(context).CookieKey), nil),
+			secureCookie: securecookie.New(convertToByte(configuration.GetConfig(context).CookieKey), nil),
 			errorService: loggers.GetErrorService(context),
 		}), nil
 	}).(Helper)
@@ -58,4 +58,12 @@ func (h cookieHelper) Delete(context ctx.Context, name string) {
 		Name:   name,
 		MaxAge: -1,
 	})
+}
+
+func convertToByte(cookieKeyStr string) []byte {
+	cookieKey, err := hex.DecodeString(cookieKeyStr)
+	if err != nil {
+		cookieKey = []byte(cookieKeyStr)
+	}
+	return cookieKey
 }
