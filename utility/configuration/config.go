@@ -1,13 +1,13 @@
 package configuration
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
 
-	"github.com/cjtoolkit/ctx"
 	"github.com/cjexp/base/utility/environment"
 	"github.com/cjexp/base/utility/loggers"
+	"github.com/cjtoolkit/ctx"
+	"github.com/pelletier/go-toml"
 )
 
 type Base struct {
@@ -46,6 +46,6 @@ func ParseConfig(context ctx.BackgroundContext, fileName string, v interface{}) 
 	errorService.CheckErrorAndPanic(err)
 	defer file.Close()
 
-	err = json.NewDecoder(file).Decode(v)
+	err = toml.NewDecoder(file).Decode(v)
 	errorService.CheckErrorAndPanic(err)
 }
