@@ -3,7 +3,7 @@ package constant
 const (
 	// Environment
 	ConfigDirectoryEnvVar  = "CJ_EXP_CONFIG_PATH"
-	DefaultConfigDirectory = "/etc/cjexp/admin"
+	DefaultConfigDirectory = "/etc/cjexp"
 
 	// Cache
 	CachePrefix         = "cjexp-%s"
