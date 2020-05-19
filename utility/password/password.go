@@ -17,7 +17,7 @@ type Password interface {
 }
 
 type password struct {
-	salt         string
+	salt         []byte
 	errorService loggers.ErrorService
 }
 
@@ -25,28 +25,27 @@ func GetPassword(context ctx.BackgroundContext) Password {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		return Password(password{
-			salt:         configuration.GetConfig(context).PasswordSalt,
+			salt:         convertToByte(configuration.GetConfig(context).PasswordSalt),
 			errorService: loggers.GetErrorService(context),
 		}), nil
 	}).(Password)
 }
 
 func (p password) SaltPassword(password string) string {
-	salt := convertToByte(p.salt)
-	hash, err := bcrypt.GenerateFromPassword(append(salt, []byte(password)...), 14)
+
+	hash, err := bcrypt.GenerateFromPassword(append(p.salt, []byte(password)...), 14)
 	p.errorService.CheckErrorAndPanic(err)
 
 	return base64.URLEncoding.EncodeToString(hash)
 }
 
 func (p password) CheckPassword(password, hash string) (ok bool) {
-	salt := convertToByte(p.salt)
 	hashBytes, err := base64.URLEncoding.DecodeString(hash)
 	if nil != err {
 		return
 	}
 
-	ok = nil == bcrypt.CompareHashAndPassword(hashBytes, append(salt, []byte(password)...))
+	ok = nil == bcrypt.CompareHashAndPassword(hashBytes, append(p.salt, []byte(password)...))
 	return
 }
 
