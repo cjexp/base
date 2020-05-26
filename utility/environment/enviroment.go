@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/cjtoolkit/ctx"
 	"github.com/cjexp/base/constant"
+	"github.com/cjtoolkit/ctx/v2"
 )
 
 const (
@@ -20,7 +20,7 @@ type Environment struct {
 	DefaultConfigDirectory string
 }
 
-func GetEnvironment(context ctx.BackgroundContext) *Environment {
+func GetEnvironment(context ctx.Context) *Environment {
 	type c struct{}
 	return context.Persist(c{}, func() (i interface{}, e error) {
 		return initEnvironment(), nil

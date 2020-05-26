@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cjtoolkit/ctx"
+	"github.com/cjtoolkit/ctx/v2/ctxHttp"
+
 	"github.com/cjexp/base/utility/cache"
 	"github.com/cjexp/base/utility/cache/internal"
 	"github.com/cjexp/base/utility/loggers"
+	"github.com/cjtoolkit/ctx/v2"
 )
 
-func GetCacheRepository(context ctx.BackgroundContext) cache.Repository {
+func GetCacheRepository(context ctx.Context) cache.Repository {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		return initCacheRepository(context), nil
@@ -23,7 +25,7 @@ type cacheRepository struct {
 	errorService loggers.ErrorService
 }
 
-func initCacheRepository(context ctx.BackgroundContext) cache.Repository {
+func initCacheRepository(context ctx.Context) cache.Repository {
 	return cacheRepository{
 		prefix:       cache.GetSettings(context).CachePrefix,
 		core:         GetCore(context),
@@ -52,7 +54,7 @@ func (c cacheRepository) Persist(name string, expiration time.Duration, miss cac
 	return data
 }
 
-func GetModifiedRepository(context ctx.BackgroundContext) cache.ModifiedRepository {
+func GetModifiedRepository(context ctx.Context) cache.ModifiedRepository {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		return initCacheModifiedRepository(context), nil
@@ -66,7 +68,7 @@ type cacheModifiedRepository struct {
 	errorService    loggers.ErrorService
 }
 
-func initCacheModifiedRepository(context ctx.BackgroundContext) cache.ModifiedRepository {
+func initCacheModifiedRepository(context ctx.Context) cache.ModifiedRepository {
 	return cacheModifiedRepository{
 		prefix:          cache.GetSettings(context).CachePrefix,
 		core:            GetCore(context),
@@ -107,7 +109,7 @@ func (c cacheModifiedRepository) getModifiedTime(name string, expiration time.Du
 	}
 	modifiedTime = stat.ModTime()
 
-	internal.CheckIfModifiedSince(context.Request(), modifiedTime)
+	internal.CheckIfModifiedSince(ctxHttp.Request(context), modifiedTime)
 
 	return modifiedTime
 }

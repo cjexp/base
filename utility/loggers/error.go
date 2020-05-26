@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cjtoolkit/ctx"
+	"github.com/cjtoolkit/ctx/v2"
 )
 
 type ErrorService interface {
@@ -16,14 +16,14 @@ type ErrorService interface {
 	GetLogger() Logger
 }
 
-func GetBlankErrorService(context ctx.BackgroundContext) ErrorService {
+func GetBlankErrorService(context ctx.Context) ErrorService {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		return initErrorService(logOutputRegistryBlank{}), nil
 	}).(ErrorService)
 }
 
-func GetErrorService(context ctx.BackgroundContext) ErrorService {
+func GetErrorService(context ctx.Context) ErrorService {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		return initErrorService(newLogOutputRegistry()), nil

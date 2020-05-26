@@ -6,10 +6,12 @@ import (
 	"encoding/hex"
 	"net/http"
 
+	"github.com/cjtoolkit/ctx/v2/ctxHttp"
+
 	"github.com/cjexp/base/utility/configuration"
 	"github.com/cjexp/base/utility/cookie/internal"
 	"github.com/cjexp/base/utility/loggers"
-	"github.com/cjtoolkit/ctx"
+	"github.com/cjtoolkit/ctx/v2"
 	"github.com/gorilla/securecookie"
 )
 
@@ -20,7 +22,7 @@ type Helper interface {
 	GetValue(context ctx.Context, name string) string
 }
 
-func GetHelper(context ctx.BackgroundContext) Helper {
+func GetHelper(context ctx.Context) Helper {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		return Helper(cookieHelper{
@@ -40,11 +42,11 @@ func (h cookieHelper) Set(context ctx.Context, cookie *http.Cookie) {
 	cookie.Value, err = h.secureCookie.Encode(cookie.Name, cookie.Value)
 	h.errorService.CheckErrorAndPanic(err)
 
-	http.SetCookie(context.ResponseWriter(), cookie)
+	http.SetCookie(ctxHttp.Response(context), cookie)
 }
 
 func (h cookieHelper) Get(context ctx.Context, name string) *http.Cookie {
-	cookie, err := context.Request().Cookie(name)
+	cookie, err := ctxHttp.Request(context).Cookie(name)
 	return internal.GetCookieDecodeAndErrorCheck(name, cookie, err, h.secureCookie)
 }
 
@@ -54,7 +56,7 @@ func (h cookieHelper) GetValue(context ctx.Context, name string) string {
 }
 
 func (h cookieHelper) Delete(context ctx.Context, name string) {
-	http.SetCookie(context.ResponseWriter(), &http.Cookie{
+	http.SetCookie(ctxHttp.Response(context), &http.Cookie{
 		Name:   name,
 		MaxAge: -1,
 	})

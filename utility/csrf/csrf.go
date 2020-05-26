@@ -7,10 +7,12 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/cjtoolkit/ctx/v2/ctxHttp"
+
 	"github.com/cjexp/base/utility/configuration"
 	"github.com/cjexp/base/utility/httpError"
 
-	"github.com/cjtoolkit/ctx"
+	"github.com/cjtoolkit/ctx/v2"
 	"github.com/gorilla/csrf"
 )
 
@@ -25,14 +27,14 @@ type Controller interface {
 	CheckCsrf(context ctx.Context)
 }
 
-func GetController(context ctx.BackgroundContext) Controller {
+func GetController(context ctx.Context) Controller {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		return initCsrfController(context), nil
 	}).(Controller)
 }
 
-func initCsrfController(context ctx.BackgroundContext) Controller {
+func initCsrfController(context ctx.Context) Controller {
 	return csrfController{
 		csrfProtect: csrf.Protect(
 			convertToByte(configuration.GetConfig(context).CsrfKey),
@@ -50,8 +52,8 @@ type csrfController struct {
 
 func (c csrfController) GetCsrfData(context ctx.Context) Data {
 	type csrfDataContext struct{}
-	return context.PersistData(csrfDataContext{}, func() interface{} {
-		return c.getCsrfData(context)
+	return context.Persist(csrfDataContext{}, func() (interface{}, error) {
+		return c.getCsrfData(context), nil
 	}).(Data)
 }
 
@@ -63,7 +65,7 @@ func (c csrfController) getCsrfData(context ctx.Context) Data {
 			TokenField: csrf.TemplateField(req),
 			Token:      csrf.Token(req),
 		}
-	})).ServeHTTP(context.ResponseWriter(), context.Request())
+	})).ServeHTTP(ctxHttp.Response(context), ctxHttp.Request(context))
 
 	return data
 }

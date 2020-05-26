@@ -6,8 +6,10 @@ import (
 	"html/template"
 	"strings"
 
-	"github.com/cjtoolkit/ctx"
+	"github.com/cjtoolkit/ctx/v2/ctxHttp"
+
 	"github.com/cjexp/base/utility/coalesce"
+	"github.com/cjtoolkit/ctx/v2"
 )
 
 type UserClientData struct {
@@ -35,13 +37,13 @@ type userClient struct{}
 
 func (c userClient) GetUserClientData(context ctx.Context) UserClientData {
 	type userClientDataContext struct{}
-	return context.PersistData(userClientDataContext{}, func() interface{} {
-		return c.buildUserClientData(context)
+	return context.Persist(userClientDataContext{}, func() (interface{}, error) {
+		return c.buildUserClientData(context), nil
 	}).(UserClientData)
 }
 
 func (_ userClient) buildUserClientData(context ctx.Context) UserClientData {
-	req := context.Request()
+	req := ctxHttp.Request(context)
 
 	Schema := coalesce.Strings(func() string {
 		return req.Header.Get("X-Forwarded-Proto")

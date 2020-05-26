@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/cjtoolkit/ctx"
 	"github.com/cjexp/base/utility/cache"
 	"github.com/cjexp/base/utility/loggers"
+	"github.com/cjtoolkit/ctx/v2"
 )
 
 type Core interface {
@@ -20,7 +20,7 @@ type Core interface {
 	Stat(key string) (os.FileInfo, error)
 }
 
-func GetCore(context ctx.BackgroundContext) Core {
+func GetCore(context ctx.Context) Core {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		c, err := initFileCore(context)
@@ -28,7 +28,7 @@ func GetCore(context ctx.BackgroundContext) Core {
 	}).(Core)
 }
 
-func initFileCore(context ctx.BackgroundContext) (Core, error) {
+func initFileCore(context ctx.Context) (Core, error) {
 	cacheDir, err := os.UserCacheDir()
 	if err != nil {
 		return nil, err

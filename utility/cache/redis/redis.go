@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cjtoolkit/ctx"
 	"github.com/cjexp/base/utility/cache"
 	"github.com/cjexp/base/utility/configuration"
 	"github.com/cjexp/base/utility/loggers"
+	"github.com/cjtoolkit/ctx/v2"
 	radix "github.com/mediocregopher/radix/v3"
 )
 
@@ -18,14 +18,14 @@ type Core interface {
 	Cmd(rcv interface{}, cmd, key string, args ...interface{}) error
 }
 
-func GetCore(context ctx.BackgroundContext) Core {
+func GetCore(context ctx.Context) Core {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		return initRedisCore(context)
 	}).(Core)
 }
 
-func initRedisCore(context ctx.BackgroundContext) (Core, error) {
+func initRedisCore(context ctx.Context) (Core, error) {
 	redisConfig := configuration.GetConfig(context).Database.Redis
 
 	radixPool, err := radix.NewPool("tcp", redisConfig.Addr, 10)

@@ -3,14 +3,14 @@ package postgres
 import (
 	"database/sql"
 
-	"github.com/cjtoolkit/ctx"
 	"github.com/cjexp/base/utility/configuration"
 	"github.com/cjexp/base/utility/embedder"
 	"github.com/cjexp/base/utility/loggers"
+	"github.com/cjtoolkit/ctx/v2"
 	_ "github.com/lib/pq"
 )
 
-func GetMainSqlDatabase(context ctx.BackgroundContext) *sql.DB {
+func GetMainSqlDatabase(context ctx.Context) *sql.DB {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		sqlDsn := configuration.GetConfig(context).Database.MainSqlDsn
@@ -20,7 +20,7 @@ func GetMainSqlDatabase(context ctx.BackgroundContext) *sql.DB {
 	}).(*sql.DB)
 }
 
-func GetMainSqlPrepareKit(context ctx.BackgroundContext) PrepareKit {
+func GetMainSqlPrepareKit(context ctx.Context) PrepareKit {
 	return PrepareKit{
 		DB:           GetMainSqlDatabase(context),
 		Builder:      GetParamBuilder(context),

@@ -5,7 +5,7 @@ package cache
 import (
 	"time"
 
-	"github.com/cjtoolkit/ctx"
+	"github.com/cjtoolkit/ctx/v2"
 )
 
 type (

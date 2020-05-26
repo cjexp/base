@@ -12,7 +12,7 @@ import (
 	"github.com/cjexp/base/utility/configuration"
 	"github.com/cjexp/base/utility/httpError"
 	"github.com/cjexp/base/utility/loggers"
-	"github.com/cjtoolkit/ctx"
+	"github.com/cjtoolkit/ctx/v2"
 )
 
 type HmacUtil interface {
@@ -20,7 +20,7 @@ type HmacUtil interface {
 	Check(context ctx.Context, message string) []byte
 }
 
-func GetHmacUtil(context ctx.BackgroundContext) HmacUtil {
+func GetHmacUtil(context ctx.Context) HmacUtil {
 	type HmacUtilContext struct{}
 	return context.Persist(HmacUtilContext{}, func() (interface{}, error) {
 		return HmacUtil(hmacUtil{

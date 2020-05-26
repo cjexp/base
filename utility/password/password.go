@@ -7,7 +7,7 @@ import (
 	"github.com/cjexp/base/utility/configuration"
 	"github.com/cjexp/base/utility/loggers"
 
-	"github.com/cjtoolkit/ctx"
+	"github.com/cjtoolkit/ctx/v2"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -21,7 +21,7 @@ type password struct {
 	errorService loggers.ErrorService
 }
 
-func GetPassword(context ctx.BackgroundContext) Password {
+func GetPassword(context ctx.Context) Password {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		return Password(password{

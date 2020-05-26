@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/cjtoolkit/ctx"
+	"github.com/cjtoolkit/ctx/v2"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -10,7 +10,7 @@ type (
 	Params = httprouter.Params
 )
 
-func getBaseRouter(context ctx.BackgroundContext) *httprouter.Router {
+func getBaseRouter(context ctx.Context) *httprouter.Router {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		router := httprouter.New()

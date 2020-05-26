@@ -5,14 +5,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cjtoolkit/ctx/v2/ctxHttp"
+
 	"github.com/cjexp/base/utility/cache/internal"
 
-	"github.com/cjtoolkit/ctx"
 	"github.com/cjexp/base/utility/cache"
 	"github.com/cjexp/base/utility/loggers"
+	"github.com/cjtoolkit/ctx/v2"
 )
 
-func GetCacheRepository(context ctx.BackgroundContext) cache.Repository {
+func GetCacheRepository(context ctx.Context) cache.Repository {
 	type c struct{}
 	return context.Persist(c{}, func() (interface{}, error) {
 		return cache.Repository(cacheRepository{
@@ -50,7 +52,7 @@ func (r cacheRepository) Persist(name string, expiration time.Duration, miss cac
 	return data
 }
 
-func GetCacheModifiedRepository(context ctx.BackgroundContext) cache.ModifiedRepository {
+func GetCacheModifiedRepository(context ctx.Context) cache.ModifiedRepository {
 	type cacheModifiedRepositoryContext struct{}
 	return context.Persist(cacheModifiedRepositoryContext{}, func() (interface{}, error) {
 		return cache.ModifiedRepository(cacheModifiedRepository{
@@ -96,7 +98,7 @@ func (r cacheModifiedRepository) getModifiedTime(modifiedName string, context ct
 	if b, err := r.redisCore.GetBytes(modifiedName); err == nil {
 		_ = json.Unmarshal(b, &modifiedTime)
 
-		internal.CheckIfModifiedSince(context.Request(), modifiedTime)
+		internal.CheckIfModifiedSince(ctxHttp.Request(context), modifiedTime)
 	}
 	return modifiedTime
 }
