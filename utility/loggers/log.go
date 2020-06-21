@@ -26,9 +26,9 @@ type customLog struct {
 	callDepth         int
 }
 
-func (l customLog) OutputRegistry() LogOutputRegistry { return l.logOutputRegistry }
+func (l *customLog) OutputRegistry() LogOutputRegistry { return l.logOutputRegistry }
 
-func (l customLog) Output(calldepth int, kind, s string) error {
+func (l *customLog) Output(calldepth int, kind, s string) error {
 	stack := debug.Stack()
 	_, file, line, ok := runtime.Caller(calldepth)
 	file, line = checkCallStatus(file, line, ok)
@@ -38,39 +38,39 @@ func (l customLog) Output(calldepth int, kind, s string) error {
 	return l.Logger.Output(calldepth+1, s)
 }
 
-func (l customLog) Clone(callDepth int) Logger {
-	return customLog{
+func (l *customLog) Clone(callDepth int) Logger {
+	return &customLog{
 		Logger:            l.Logger,
 		logOutputRegistry: l.logOutputRegistry,
 		callDepth:         callDepth,
 	}
 }
 
-func (l customLog) Panic(v ...interface{}) {
+func (l *customLog) Panic(v ...interface{}) {
 	s := fmt.Sprint(v...)
 	l.Output(l.callDepth, "Panic", s)
 	panic(s)
 }
 
-func (l customLog) Panicf(format string, v ...interface{}) {
+func (l *customLog) Panicf(format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
 	l.Output(l.callDepth, "Panic", s)
 	panic(s)
 }
 
-func (l customLog) Panicln(v ...interface{}) {
+func (l *customLog) Panicln(v ...interface{}) {
 	s := fmt.Sprintln(v...)
 	l.Output(l.callDepth, "Panic", s)
 	panic(s)
 }
 
-func (l customLog) Print(v ...interface{}) { l.Output(l.callDepth, "Print", fmt.Sprint(v...)) }
+func (l *customLog) Print(v ...interface{}) { l.Output(l.callDepth, "Print", fmt.Sprint(v...)) }
 
-func (l customLog) Printf(format string, v ...interface{}) {
+func (l *customLog) Printf(format string, v ...interface{}) {
 	l.Output(l.callDepth, "Print", fmt.Sprintf(format, v...))
 }
 
-func (l customLog) Println(v ...interface{}) { l.Output(l.callDepth, "Print", fmt.Sprintln(v...)) }
+func (l *customLog) Println(v ...interface{}) { l.Output(l.callDepth, "Print", fmt.Sprintln(v...)) }
 
 type LoggerOutputer interface {
 	Output(line int, file, kind, s string, stack []byte) error

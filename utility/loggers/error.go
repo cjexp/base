@@ -30,9 +30,9 @@ func GetErrorService(context ctx.Context) ErrorService {
 	}).(ErrorService)
 }
 
-func initErrorService(registry LogOutputRegistry) errorService {
-	return errorService{
-		log: customLog{
+func initErrorService(registry LogOutputRegistry) ErrorService {
+	return &errorService{
+		log: &customLog{
 			Logger:            log.New(os.Stderr, "INFO: ", log.Lshortfile),
 			logOutputRegistry: registry,
 			callDepth:         3,
@@ -44,13 +44,13 @@ type errorService struct {
 	log Logger
 }
 
-func (e errorService) CheckErrorAndPanic(err error) {
+func (e *errorService) CheckErrorAndPanic(err error) {
 	if nil != err {
 		e.log.Panic(err)
 	}
 }
 
-func (e errorService) CheckErrorAndLog(err error) {
+func (e *errorService) CheckErrorAndLog(err error) {
 	if nil != err {
 		e.log.Print(err)
 	}
